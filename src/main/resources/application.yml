@@ -1,0 +1,62 @@
+server:
+  port: 80
+  
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:  
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedHeaders: "*"
+            allowedMethods:
+            - GET
+            - POST    
+      default-filters:
+      - SecureHeaders
+      filter:
+        secure-headers:
+          frame-options: SAMEORIGIN
+          disable:
+          - content-security-policy
+      routes:
+      - id: api
+        uri: lb://WMAPI
+        predicates:
+        - Path=/wmapi, /wmapi/*.html, /wmapi/*/*.html, /wmapi/im/**, /wmapi/actuator/**        
+        filters:
+        - AddRequestHeader=X-Request-AppId, wmapi
+        - OAuthFilter
+        - RewritePath=/wmapi, /wmapi/
+      - id: wm-ui
+        uri: lb://WM-UI
+        predicates:
+        - Path=/, /*.html, /*/*.html, /static/**, /actuator/**        
+        filters:
+        - AddRequestHeader=X-Request-AppId, wm-ui
+        - OAuthFilter
+      - id: oauth
+        uri: lb://OAUTH
+        predicates:
+        - Path=/oauth/**
+      - id: cryptography
+        uri: lb://CRYPTOGRAPHY
+        predicates:
+        - Path=/cryptography/api/**
+        filters:
+        - OAuthFilter 
+
+eureka:
+  client:
+    region: default
+    service-url:
+      defaultZone: http://127.0.0.1:83/eureka
+  instance:
+    prefer-ip-address: true
+    
+whitelist:
+  pages:
+    - "/"
+    - "/expired.html"    
