@@ -25,8 +25,6 @@ public class OAuthFilter extends AbstractGatewayFilterFactory<OAuthFilter.Config
 	    return ((exchange, chain) -> {	    	
 	    	if(!exchange.getRequest().getPath().value().contains("/expired.html") && !exchange.getRequest().getPath().value().equals("/") && !exchange.getRequest().getPath().value().equals("/index.html"))
 		    	if(exchange.getRequest().getPath().value().contains("/api/") || exchange.getRequest().getPath().value().endsWith(".html")) {
-			    	System.out.println("***************** " + exchange.getRequest().getPath().value());
-			    	
 					String token = exchange.getRequest().getQueryParams().getFirst("token");
 	
 					if(token == null && exchange.getRequest().getHeaders().getFirst("X-AUTH-TOKEN") != null)
